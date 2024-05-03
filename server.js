@@ -1,12 +1,26 @@
 const express = require("express");
+const fs = require("fs");
+const https = require("https");
 
 const app = express();
+app.use(express.json());
+
+const { addUser } = require("./db-connection");
+
 const userRoute = require("./routes/User");
 app.use("/users", userRoute);
 
-// Démarrage du serveur
-app.listen(8083, () => {
-  console.log("Server running on port 8083");
+app.post("/users", async (req, res) => {
+  const result = await addUser(req.body);
+  if (result.errors) {
+    return res.status(400).json({ errors: result.errors });
+  }
+  res.status(201).send("User created");
 });
 
-//ajout du type: model dans le package.json
+const options = {
+  key: fs.readFileSync("certificat/server.key"),
+  cert: fs.readFileSync("certificat/server.cert"),
+};
+
+https.createServer(options, app).listen(443);
