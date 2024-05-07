@@ -5,7 +5,7 @@ const https = require("https");
 const app = express();
 app.use(express.json());
 
-const { addUser } = require("./db-connection");
+const { addUser } = require("./db/db-connection");
 
 const userRoute = require("./routes/User");
 app.use("/users", userRoute);
