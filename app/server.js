@@ -5,17 +5,18 @@ const https = require("https");
 const app = express();
 app.use(express.json());
 
-const { addUser } = require("./db/db-connection");
+const { addUser } = require("./models/UserModel");
 
 const userRoute = require("./routes/User");
 app.use("/users", userRoute);
 
 app.post("/users", async (req, res) => {
-  const result = await addUser(req.body);
-  if (result.errors) {
-    return res.status(400).json({ errors: result.errors });
+  try {
+    const result = await addUser(req.body);
+    res.status(201).send({ message: "User created", data: result });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
-  res.status(201).send("User created");
 });
 
 const options = {
