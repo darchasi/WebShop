@@ -8,15 +8,28 @@ const pool = mysql.createPool({
   port: 6033,
 });
 
+const crypto = require("crypto");
+async function hashPassword(password) {
+  return crypto.createHash("sha256").update(password).digest("hex");
+}
+
 async function insertUsers(users) {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
     for (const user of users) {
-      const { id, firstName, lastName, nickName } = user;
-      const sql = `INSERT INTO Users (id, firstName, lastName, nickName) VALUES (?, ?, ?, ?)`;
-      await conn.execute(sql, [id, firstName, lastName, nickName]);
+      const { firstName, lastName, nickName, password, isAdmin } = user;
+      const hashedPassword = await hashPassword(password); // Hashea la contraseña antes de insertarla
+
+      const sql = `INSERT INTO t_User (usefirstName, uselastName, usenickName, usepassword, useisAdmin) VALUES (?, ?, ?, ?, ?)`;
+      await conn.execute(sql, [
+        firstName,
+        lastName,
+        nickName,
+        hashedPassword, // Usa la contraseña hasheada
+        isAdmin,
+      ]);
     }
 
     await conn.commit();

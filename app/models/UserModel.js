@@ -4,7 +4,6 @@ const validateUser = (user) => {
   const errors = [];
   const regex = /^[A-Za-z0-9\s]+$/;
 
-  // Validación de firstName
   if (!user.firstName || user.firstName.trim().length === 0)
     errors.push("Le prénom de l'utilisateur ne peut pas être vide.");
   if (user.firstName.length > 35)
@@ -42,19 +41,21 @@ const validateUser = (user) => {
 const addUser = async (user) => {
   const errors = validateUser(user);
   if (errors.length > 0) {
-    throw new Error(errors.join(", ")); // Lanza un error si hay errores
+    throw new Error(errors.join(", "));
   }
 
-  const sql = `INSERT INTO User (firstName, lastName, nickName) VALUES (?, ?, ?)`;
+  `INSERT INTO t_User (usefirstName, uselastName, usenickName, usepassword, useisAdmin) VALUES (?, ?, ?, ?, ?)`;
   try {
     const [result] = await db.query(sql, [
       user.firstName,
       user.lastName,
       user.nickName,
+      user.password,
+      user.isAdmin,
     ]);
     return result;
   } catch (error) {
-    throw new Error("Failed to insert user: " + error.message); // Lanza un error en caso de fallo en la inserción
+    throw new Error("Failed to insert user: " + error.message);
   }
 };
 

@@ -1,10 +1,11 @@
 let users = [
   {
     id: 1,
-    firstName: "",
+    firstName: "John",
     lastName: "Doe",
     nickName: "JohnDoe",
     password: "1234",
+    isAdmin: true,
   },
   {
     id: 2,
@@ -12,6 +13,7 @@ let users = [
     lastName: "Doe",
     nickName: "JaneDoe",
     password: "4321",
+    isAdmin: true,
   },
   {
     id: 3,
@@ -19,6 +21,7 @@ let users = [
     lastName: "Zarrabi",
     nickName: "ScoobyDoo",
     password: "BabyGirl",
+    isAdmin: false,
   },
 ];
 
