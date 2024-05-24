@@ -1,26 +1,26 @@
 const express = require("express");
 const fs = require("fs");
 const https = require("https");
-
+const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-const { addUser } = require("./db-connection");
-
 const userRoute = require("./routes/User");
-app.use("/users", userRoute);
 
-app.post("/users", async (req, res) => {
-  const result = await addUser(req.body);
-  if (result.errors) {
-    return res.status(400).json({ errors: result.errors });
-  }
-  res.status(201).send("User created");
-});
+var corsOptions = {
+  origin: `http://localhost:5173`,
+  optionsSuccessStatus: 200, // For legacy browser support
+};
+app.use(cors(corsOptions));
+
+app.use("/users", userRoute);
+app.use("/login", userRoute);
 
 const options = {
   key: fs.readFileSync("certificat/server.key"),
   cert: fs.readFileSync("certificat/server.cert"),
 };
 
-https.createServer(options, app).listen(443);
+https.createServer(options, app).listen(443, () => {
+  console.log("Server is running on https://localhost:443");
+});

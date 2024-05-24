@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <title>Barre de recherche des utilisateurs</title>
+  </head>
+  <body>
+    <script>
+      async function fetchAPI() {
+        let nickName = document.getElementById("search").value;
+
+        try {
+          let result = await fetch(`https://localhost:443/users/${nickName}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MTYyMTY3NzEsImV4cCI6MTc0Nzc3NDM3MX0.y_HG-hv3sTdwW_5iPcmQkoV4bbAFk_Re6g9pK_sI2l4",
+            },
+            credentials: "include",
+          });
+
+          if (result.ok) {
+            let users = await result.json();
+            displayResults(users);
+          } else {
+            console.error("Failed to fetch users:", result.statusText);
+          }
+        } catch (error) {
+          console.error("Error during fetch:", error);
+        }
+      }
+
+      function displayResults(users) {
+        let resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = "";
+
+        if (users.length === 0) {
+          resultsDiv.innerHTML = "<p>No users found</p>";
+          return;
+        }
+
+        users.forEach((user) => {
+          let userDiv = document.createElement("div");
+          userDiv.innerHTML = `<p>Nickname: ${user.usenickName}, Name: ${user.usefirstName} ${user.uselastName}</p>`;
+          resultsDiv.appendChild(userDiv);
+        });
+      }
+    </script>
+
+    <form>
+      <input type="search" name="search" id="search" />
+      <input type="button" value="Submit" onclick="fetchAPI()" />
+    </form>
+
+    <div id="results"></div>
+  </body>
+</html>
