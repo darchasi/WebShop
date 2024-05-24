@@ -1,5 +1,3 @@
-const db = require("../db/db-connection");
-
 const validateUser = (user) => {
   const errors = [];
   const regex = /^[A-Za-z0-9\s]+$/;
@@ -37,28 +35,4 @@ const validateUser = (user) => {
 
   return errors;
 };
-
-const addUser = async (user) => {
-  const errors = validateUser(user);
-  if (errors.length > 0) {
-    throw new Error(errors.join(", "));
-  }
-
-  `INSERT INTO t_User (usefirstName, uselastName, usenickName, usepassword, useisAdmin) VALUES (?, ?, ?, ?, ?)`;
-  try {
-    const [result] = await db.query(sql, [
-      user.firstName,
-      user.lastName,
-      user.nickName,
-      user.password,
-      user.isAdmin,
-    ]);
-    return result;
-  } catch (error) {
-    throw new Error("Failed to insert user: " + error.message);
-  }
-};
-
-module.exports = {
-  addUser,
-};
+module.exports = { validateUser };
