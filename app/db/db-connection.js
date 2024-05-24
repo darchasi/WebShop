@@ -1,8 +1,6 @@
 const mysql = require("mysql2/promise");
-<<<<<<< HEAD:db/db-connection.js
 const crypto = require("crypto");
-=======
->>>>>>> c5dad273eb1f76c1428e530aeda2963fc81c6b91:app/db/db-connection.js
+const { validateUser } = require("../models/UserModel");
 
 const pool = mysql.createPool({
   host: "localhost",
@@ -12,7 +10,6 @@ const pool = mysql.createPool({
   port: 6033,
 });
 
-<<<<<<< HEAD:db/db-connection.js
 function generateSalt() {
   return crypto.randomBytes(16).toString("hex");
 }
@@ -22,40 +19,41 @@ async function hashPassword(password, salt) {
     .createHash("sha256")
     .update(password + salt)
     .digest("hex");
-=======
-const crypto = require("crypto");
-async function hashPassword(password) {
-  return crypto.createHash("sha256").update(password).digest("hex");
->>>>>>> c5dad273eb1f76c1428e530aeda2963fc81c6b91:app/db/db-connection.js
 }
-
+async function userExists(nickName) {
+  const [rows] = await pool.execute(
+    "SELECT 1 FROM t_User WHERE usenickName = ?",
+    [nickName]
+  );
+  return rows.length > 0;
+}
 async function insertUsers(users) {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
     for (const user of users) {
+      const validationErrors = validateUser(user);
+      if (validationErrors.length > 0) {
+        console.error("User validation failed:", validationErrors);
+        throw new Error("User validation failed");
+      }
+
       const { firstName, lastName, nickName, password, isAdmin } = user;
-<<<<<<< HEAD:db/db-connection.js
+      if (await userExists(nickName)) {
+        console.log(`User ${nickName} already exists. Skipping insertion.`);
+        continue;
+      }
       const salt = generateSalt();
       const hashedPassword = await hashPassword(password, salt);
 
       const sql = `INSERT INTO t_User (usefirstName, uselastName, usenickName, usepassword, usesalt, useisAdmin) VALUES (?, ?, ?, ?, ?, ?)`;
-=======
-      const hashedPassword = await hashPassword(password); // Hashea la contraseña antes de insertarla
-
-      const sql = `INSERT INTO t_User (usefirstName, uselastName, usenickName, usepassword, useisAdmin) VALUES (?, ?, ?, ?, ?)`;
->>>>>>> c5dad273eb1f76c1428e530aeda2963fc81c6b91:app/db/db-connection.js
       await conn.execute(sql, [
         firstName,
         lastName,
         nickName,
-<<<<<<< HEAD:db/db-connection.js
         hashedPassword,
         salt,
-=======
-        hashedPassword, // Usa la contraseña hasheada
->>>>>>> c5dad273eb1f76c1428e530aeda2963fc81c6b91:app/db/db-connection.js
         isAdmin,
       ]);
     }

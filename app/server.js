@@ -7,7 +7,6 @@ app.use(express.json());
 
 const userRoute = require("./routes/User");
 
-<<<<<<< HEAD:server.js
 var corsOptions = {
   origin: `http://localhost:5173`,
   optionsSuccessStatus: 200, // For legacy browser support
@@ -15,8 +14,6 @@ var corsOptions = {
 app.use(cors(corsOptions));
 
 app.use("/users", userRoute);
-=======
->>>>>>> c5dad273eb1f76c1428e530aeda2963fc81c6b91:app/server.js
 app.use("/login", userRoute);
 
 const options = {

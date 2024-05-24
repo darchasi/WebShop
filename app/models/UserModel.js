@@ -32,7 +32,14 @@ const validateUser = (user) => {
     errors.push(
       "Seules les lettres, les chiffres et les espaces sont autorisées."
     );
+  if (!user.password || user.password.trim().length === 0)
+    errors.push("Le mot de passe ne peut pas être vide.");
+  if (user.password.length < 4)
+    errors.push("Le mot de passe doit contenir au moins 4 caractères.");
+  if (typeof user.isAdmin !== "boolean")
+    errors.push("Le rôle d'administrateur doit être un booléen.");
 
   return errors;
 };
+
 module.exports = { validateUser };
