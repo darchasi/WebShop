@@ -72,12 +72,14 @@ module.exports.addUser = async (req, res) => {
     ]);
 
     await conn.commit();
-    return result;
+    const message = "User successfully added";
+    return res.status(201).json({ msg: message, data: result });
   } catch (error) {
     if (conn) {
       await conn.rollback();
     }
-    throw new Error("Failed to insert user: " + error.message);
+    const message = "Failed to insert user: ";
+    return res.status(500).json({ msg: message, data: error.message });
   } finally {
     if (conn) {
       conn.release();

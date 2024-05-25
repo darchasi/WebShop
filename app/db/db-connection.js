@@ -47,7 +47,7 @@ async function insertUsers(users) {
         continue;
       }
 
-      const salt = generateSalt(nickName); // Utiliza el nickName para generar el salt
+      const salt = generateSalt(nickName);
       const hashedPassword = await hashPassword(password, salt);
 
       const sql = `INSERT INTO t_User (usefirstName, uselastName, usenickName, usepassword, usesalt, useisAdmin) VALUES (?, ?, ?, ?, ?, ?)`;
