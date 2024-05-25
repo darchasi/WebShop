@@ -10,8 +10,8 @@ const pool = mysql.createPool({
   port: 6033,
 });
 
-function generateSalt() {
-  return crypto.randomBytes(16).toString("hex");
+function generateSalt(nickName) {
+  return crypto.createHash("sha256").update(nickName).digest("hex");
 }
 
 async function hashPassword(password, salt) {
@@ -20,6 +20,7 @@ async function hashPassword(password, salt) {
     .update(password + salt)
     .digest("hex");
 }
+
 async function userExists(nickName) {
   const [rows] = await pool.execute(
     "SELECT 1 FROM t_User WHERE usenickName = ?",
@@ -27,6 +28,7 @@ async function userExists(nickName) {
   );
   return rows.length > 0;
 }
+
 async function insertUsers(users) {
   const conn = await pool.getConnection();
   try {
@@ -44,7 +46,8 @@ async function insertUsers(users) {
         console.log(`User ${nickName} already exists. Skipping insertion.`);
         continue;
       }
-      const salt = generateSalt();
+
+      const salt = generateSalt(nickName); // Utiliza el nickName para generar el salt
       const hashedPassword = await hashPassword(password, salt);
 
       const sql = `INSERT INTO t_User (usefirstName, uselastName, usenickName, usepassword, usesalt, useisAdmin) VALUES (?, ?, ?, ?, ?, ?)`;

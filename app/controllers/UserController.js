@@ -1,4 +1,6 @@
+const { validateUser } = require("../models/UserModel");
 const { pool } = require("../db/db-connection");
+const crypto = require("crypto");
 
 module.exports.getAll = async (req, res) => {
   try {
@@ -30,26 +32,55 @@ module.exports.getUserByNickname = async (req, res) => {
     res.status(500).send({ msg: Publicmessage });
   }
 };
-/*
-const addUser = async (user) => {
+
+function generateSalt(nickName) {
+  return crypto.createHash("sha256").update(nickName).digest("hex");
+}
+
+async function hashPassword(password, salt) {
+  return crypto
+    .createHash("sha256")
+    .update(password + salt)
+    .digest("hex");
+}
+
+module.exports.addUser = async (req, res) => {
+  const user = req.body;
+
   const errors = validateUser(user);
   if (errors.length > 0) {
     throw new Error(errors.join(", "));
   }
 
-  `INSERT INTO t_User (usefirstName, uselastName, usenickName, usepassword, useisAdmin) VALUES (?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO t_User (usefirstName, uselastName, usenickName, usepassword, usesalt, useisAdmin) VALUES (?, ?, ?, ?, ?, ?)`;
+
+  let conn;
   try {
-    const [result] = await db.query(sql, [
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
+
+    const salt = generateSalt(user.nickName);
+    const hashedPassword = await hashPassword(user.password, salt);
+
+    const [result] = await conn.query(sql, [
       user.firstName,
       user.lastName,
       user.nickName,
-      user.password,
+      hashedPassword,
+      salt,
       user.isAdmin,
     ]);
+
+    await conn.commit();
     return result;
   } catch (error) {
+    if (conn) {
+      await conn.rollback();
+    }
     throw new Error("Failed to insert user: " + error.message);
+  } finally {
+    if (conn) {
+      conn.release();
+    }
   }
 };
-
-*/

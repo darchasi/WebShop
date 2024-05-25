@@ -27,7 +27,8 @@ module.exports.login = async (req, res) => {
       return res.status(404).json({ message });
     }
 
-    const hashedPassword = await hashPassword(req.body.password, user.usesalt);
+    const salt = user.usesalt;
+    const hashedPassword = await hashPassword(req.body.password, salt);
 
     console.log("Hashed password:", hashedPassword);
     console.log("User stored password:", user.usepassword);
@@ -36,9 +37,13 @@ module.exports.login = async (req, res) => {
       const message = "Le mot de passe est incorrecte.";
       return res.status(401).json({ message });
     } else {
-      const token = jwt.sign({ userId: user.id }, privateKey, {
-        expiresIn: "1y",
-      });
+      const token = jwt.sign(
+        { userId: user.id, isAdmin: user.useisAdmin },
+        privateKey,
+        {
+          expiresIn: "1y",
+        }
+      );
       const message = "L'utilisateur a été connecté avec succès";
       return res.json({ message, data: user, token });
     }
