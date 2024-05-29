@@ -4,7 +4,9 @@ const crypto = require("crypto");
 
 module.exports.getAll = async (req, res) => {
   try {
-    const [users] = await pool.query("SELECT * FROM t_User");
+    const [users] = await pool.query(
+      "SELECT useId,usefirstName,uselastName, usenickName FROM t_User"
+    );
     res.json({ data: users });
   } catch (error) {
     const message = "Failed to retrieve users:";
@@ -17,7 +19,7 @@ module.exports.getUserByNickname = async (req, res) => {
   try {
     const nickname = req.params.nickname;
     const [users] = await pool.query(
-      "SELECT * FROM t_User WHERE usenickName LIKE ?",
+      "SELECT useId,usefirstName,uselastName, usenickName FROM t_User WHERE usenickName LIKE ?",
       [`%${nickname}%`]
     );
     if (users.length === 0) {
